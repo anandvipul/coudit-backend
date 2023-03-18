@@ -142,7 +142,17 @@ router.get("/articles", (req, res, next) => {
 // Get article
 
 // Create Article
-router.post("/articles", (req, res, next) => {});
+router.post("/articles", auth.authorize, (req, res, next) => {
+  let article = req.body;
+  let slug = req.body.title.split(" ").join("-");
+  Profile.findOneAndUpdate(
+    { email: req.user },
+    { $push: { articlesAuthored: { slug: slug, ...article } } }
+  ).then((doc) => {
+    console.log(doc);
+    res.json(doc);
+  });
+});
 
 // Update Article
 
