@@ -142,12 +142,13 @@ router.get("/articles", (req, res, next) => {
 // Get article
 
 // Create Article
-router.post("/articles", auth.authorize, (req, res, next) => {
+router.post("/articles", auth.authorize, async (req, res, next) => {
   let article = req.body;
   let slug = req.body.title.split(" ").join("-");
+  let newArticle = await Article.create({ slug: slug, ...article });
   Profile.findOneAndUpdate(
     { email: req.user },
-    { $push: { articlesAuthored: { slug: slug, ...article } } }
+    { $push: { articlesAuthored: newArticle } }
   ).then((doc) => {
     console.log(doc);
     res.json(doc);
