@@ -172,6 +172,24 @@ router.put("/articles/:slug", auth.authorize, async (req, res, next) => {
   });
 });
 // Delete Article
+router.delete("/articles/:slug", auth.authorize, async (req, res, next) => {
+  let slug = req.params.slug;
+  let article = await Article.findOne({ slug: slug });
+  // Check if logged in user is eleigible to edit the article
+  //   console.log(slug);
+  await Profile.find({
+    articlesAuthored: { $elemMatch: { $eq: article._id } },
+  }).then(async (doc) => {
+    console.log(doc);
+    if (doc !== null) {
+      let index = await doc[0].articlesAuthored.indexOf(article._id);
+      doc[0].articlesAuthored.splice(index, 1);
+      await doc[0].save();
+      await Article.findByIdAndDelete(article._id);
+      res.json({ message: "Deleted" });
+    }
+  });
+});
 
 // Add Comments to an Article
 
