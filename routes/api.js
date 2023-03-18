@@ -156,7 +156,21 @@ router.post("/articles", auth.authorize, async (req, res, next) => {
 });
 
 // Update Article
-
+router.put("/articles/:slug", auth.authorize, async (req, res, next) => {
+  let slug = req.params.slug;
+  let article = await Article.findOne({ slug: slug });
+  // Check if logged in user is eleigible to edit the article
+  //   console.log(slug);
+  await Profile.find({
+    articlesAuthored: { $elemMatch: { $eq: article._id } },
+  }).then(async (doc) => {
+    console.log(doc);
+    if (doc !== null) {
+      await Article.updateOne({ _id: article._id }, { ...req.body });
+    }
+    res.json({ message: "found it" });
+  });
+});
 // Delete Article
 
 // Add Comments to an Article
