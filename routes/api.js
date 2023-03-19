@@ -7,6 +7,7 @@ let auth = require("../middleware/auth");
 let Mongoose = require("mongoose");
 let Article = require("../models/Article");
 let Comment = require("../models/Comment");
+const Tag = require("../models/Tag");
 
 // Welcome To The API Portal
 router.get("/", (req, res, next) => {
@@ -236,9 +237,39 @@ router.delete(
 );
 
 // Favorite Article
+router.post(
+  "/articles/:slug/favourite",
+  auth.authorize,
+  async (req, res, next) => {
+    let article = await Article.findOne({ slug: req.params.slug });
+    Profile.findById(req.id).then(async (doc) => {
+      await doc.articlesFav.push(article._id);
+      doc.save();
+      res.json(doc);
+    });
+  }
+);
 
 // Unfavorite Article
+router.delete(
+  "/articles/:slug/favourite",
+  auth.authorize,
+  async (req, res, next) => {
+    let article = await Article.findOne({ slug: req.params.slug });
+    Profile.findById(req.id).then(async (doc) => {
+      let indexFav = doc.articlesFav.indexOf(article._id);
+      await doc.articlesFav.splice(indexFav, 1);
+      doc.save();
+      res.json(doc);
+    });
+  }
+);
 
 // Get tags
+router.get("/tags", async (req, res, next) => {
+  Tag.find().then((data) => {
+    res.json(data);
+  });
+});
 
 module.exports = router;

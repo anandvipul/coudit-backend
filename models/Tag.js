@@ -8,4 +8,4 @@ let tagSchema = new Schema(
   { timestamps: true }
 );
 
-module.exports = mongoose.model(tagSchema, "Tags");
+module.exports = mongoose.model("Tag", tagSchema);
