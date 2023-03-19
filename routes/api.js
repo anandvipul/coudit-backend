@@ -235,4 +235,10 @@ router.delete(
   }
 );
 
+// Favorite Article
+
+// Unfavorite Article
+
+// Get tags
+
 module.exports = router;
