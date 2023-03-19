@@ -145,7 +145,11 @@ router.get("/articles", (req, res, next) => {
 router.post("/articles", auth.authorize, async (req, res, next) => {
   let article = req.body;
   let slug = req.body.title.split(" ").join("-");
-  let newArticle = await Article.create({ slug: slug, ...article });
+  let newArticle = await Article.create({
+    slug: slug,
+    author: req.id,
+    ...article,
+  });
   Profile.findOneAndUpdate(
     { email: req.user },
     { $push: { articlesAuthored: newArticle } }
@@ -192,7 +196,30 @@ router.delete("/articles/:slug", auth.authorize, async (req, res, next) => {
 });
 
 // Add Comments to an Article
+router.post(
+  "/articles/:slug/comments",
+  auth.authorize,
+  async (req, res, next) => {
+    let userId = req.id;
 
-// Get COmments from an Article
+    let newComment = new Comment({ author: userId, ...req.body });
+
+    Article.findOne({ slug: req.params.slug }).then(async (doc) => {
+      await doc.comments.push(newComment);
+      await doc.save();
+      await newComment.save();
+      await res.json(doc);
+    });
+  }
+);
+
+// Get Comments from an Article
+router.get("/articles/:slug/comments", (req, res, next) => {
+  Article.findOne({ slug: req.params.slug })
+    .populate("comments")
+    .then((data) => {
+      res.json(data.comments);
+    });
+});
 
 module.exports = router;
