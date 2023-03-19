@@ -222,4 +222,17 @@ router.get("/articles/:slug/comments", (req, res, next) => {
     });
 });
 
+// Delete Comment
+router.delete(
+  "/articles/:slug/comments/:id",
+  auth.authorize,
+  async (req, res, next) => {
+    let slug = req.params.slug;
+    let id = req.params.id;
+    Comment.findByIdAndDelete(id).then({
+      message: "deleted Comment",
+    });
+  }
+);
+
 module.exports = router;
