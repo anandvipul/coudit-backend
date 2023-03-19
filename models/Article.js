@@ -9,7 +9,7 @@ let articleSchema = new Schema(
     body: { type: String },
     tagList: [{ type: Schema.Types.ObjectId, ref: "Tag" }],
     favCount: { type: Number },
-    authors: [{ type: Schema.Types.ObjectId, ref: "User" }],
+    author: { type: Schema.Types.ObjectId, ref: "User" },
     comments: [{ type: Schema.Types.ObjectId, ref: "Comment" }],
   },
   { timestamps: true }
